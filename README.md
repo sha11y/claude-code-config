@@ -68,11 +68,24 @@ macOS only. On Linux, see the [Ghostty install docs](https://ghostty.org/docs/in
 
 #### Tools
 
+Install nvm and bun via curl:
+```bash
+# install nvm and use node 22
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.4/install.sh | bash
+nvm install 22
+nvm use 22
+
+# install bun
+curl -fsSL https://bun.sh/install | bash
+exec /bin/zsh
+bun --help
+```
+
+
 Install core tools via Homebrew:
 
 ```bash
-brew install jq ripgrep fd ast-grep shellcheck shfmt \
-  actionlint zizmor macos-trash node@22 pnpm uv
+brew install jq ripgrep fd ast-grep shellcheck shfmt actionlint zizmor macos-trash pnpm uv go
 ```
 
 Python tools (via uv):
@@ -87,45 +100,34 @@ Rust toolchain:
 
 ```bash
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
-cargo install prek worktrunk cargo-deny cargo-careful
+cargo install --locked prek worktrunk cargo-deny cargo-careful
+```
+
+Go tools:
+
+```bash
+# go is installed via Homebrew above
+go install golang.org/x/tools/gopls@latest
+
+# gopls installs to ~/go/bin — add to ~/.zshrc:
+export PATH="$HOME/go/bin:$PATH"
 ```
 
 Node tools:
 
 ```bash
-npm install -g oxlint agent-browser
+npm install -g oxlint agent-browser @anthropic-ai/sandbox-runtime @ast-grep/cli oxfmt
 ```
-
-LM Studio (for [local models](#local-models)):
-
-```bash
-curl -fsSL https://lmstudio.ai/install.sh | bash
-```
-
-This installs `lms` (the CLI) and `llmster` (the headless daemon). Or install the [LM Studio desktop app](https://lmstudio.ai/download) if you prefer a GUI.
 
 ### Shell Setup
 
 Add to `~/.zshrc`:
 
 ```bash
-alias claude-yolo="claude --dangerously-skip-permissions"
+alias cy="claude --dangerously-skip-permissions"
 ```
 
 `--dangerously-skip-permissions` bypasses all permission prompts. This is the recommended way to run Claude Code for maximum throughput -- pair it with sandboxing (below).
-
-If you're using [local models](#local-models), also add:
-
-```bash
-claude-local() {
-  ANTHROPIC_BASE_URL=http://localhost:1234 \
-  ANTHROPIC_AUTH_TOKEN=lmstudio \
-  CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1 \
-  claude --model qwen/qwen3-coder-next "$@"
-}
-```
-
-`claude-local` wraps `claude` with the local server env vars and disables telemetry pings that won't reach Anthropic anyway. Use it anywhere you'd normally run `claude`.
 
 ### Settings
 
